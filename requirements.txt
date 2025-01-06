@@ -1,0 +1,50 @@
+absl-py==2.1.0
+astunparse==1.6.3
+cachetools==5.5.0
+certifi==2024.12.14
+charset-normalizer==3.4.1
+flatbuffers==24.12.23
+gast==0.4.0
+google-auth==2.37.0
+google-auth-oauthlib==1.0.0
+google-pasta==0.2.0
+grpcio==1.69.0
+h5py==3.12.1
+idna==3.10
+importlib_metadata @ file:///home/conda/feedstock_root/build_artifacts/importlib-metadata_1733223117029/work
+jax @ file:///home/conda/feedstock_root/build_artifacts/jax_1720615675561/work
+jaxlib==0.4.28.dev20240710
+joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1733736026804/work
+kagglehub==0.3.6
+keras==2.12.0
+libclang==18.1.1
+Markdown==3.7
+MarkupSafe==3.0.2
+ml-dtypes @ file:///Users/runner/miniforge3/conda-bld/ml_dtypes_1726376280741/work
+numpy==1.23.5
+oauthlib==3.2.2
+opt_einsum @ file:///home/conda/feedstock_root/build_artifacts/opt_einsum_1733687912731/work
+packaging==24.2
+protobuf==4.25.5
+pyasn1==0.6.1
+pyasn1_modules==0.4.1
+requests==2.32.3
+requests-oauthlib==2.0.0
+rsa==4.9
+scikit-learn @ file:///Users/runner/miniforge3/conda-bld/scikit-learn_1733760152424/work/dist/scikit_learn-1.6.0-cp39-cp39-macosx_10_13_x86_64.whl#sha256=c630fc677e7c60bae7a366c8e9f5bc5c25bc57578ac138b73a5c8190901eaffc
+scipy @ file:///Users/runner/miniforge3/conda-bld/scipy-split_1716470285601/work/dist/scipy-1.13.1-cp39-cp39-macosx_10_13_x86_64.whl#sha256=c9dd6de2b24ca5604e6e5444642497657db2f4e882c088c0d710addb7781a300
+six==1.17.0
+tensorboard==2.12.3
+tensorboard-data-server==0.7.2
+tensorflow-estimator==2.12.0
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-macos==2.12.0
+tensorflow-metal==1.0.0
+termcolor==2.5.0
+threadpoolctl @ file:///home/conda/feedstock_root/build_artifacts/threadpoolctl_1714400101435/work
+tqdm==4.67.1
+typing_extensions==4.12.2
+urllib3==2.3.0
+Werkzeug==3.1.3
+wrapt==1.14.1
+zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1732827521216/work
