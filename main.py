@@ -104,11 +104,14 @@ async def predict_image(file: UploadFile = File(...)):
     prediction = model.predict(processed_image)
     fake_probability = float(prediction[0][0])
     
+    cam_map = np.mean(processed_image[0], axis=-1)  
+
     return {
         "filename": file.filename,
         "fake_probability": fake_probability,
         "is_fake": fake_probability > 0.5,
-        "model_used": MODEL_FILENAME
+        "model_used": MODEL_FILENAME,
+        "cam_map": cam_map.tolist()
     }
 
 @app.get("/")
