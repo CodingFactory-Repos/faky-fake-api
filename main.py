@@ -107,7 +107,8 @@ async def predict_image(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
         "fake_probability": fake_probability,
-        "is_fake": fake_probability > 0.5
+        "is_fake": fake_probability > 0.5,
+        "model_used": MODEL_FILENAME
     }
 
 @app.get("/")
@@ -117,3 +118,30 @@ async def root():
 if __name__ == "__main__":
     print(f"Starting server on port {PORT}")
     uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
+
+
+@app.get("/healthcheck")
+async def healthcheck():
+    # Vérification du modèle
+    model_status = "loaded" if model is not None else "not loaded"
+    
+    # Vérification des connexions externes (optionnel)
+    try:
+        comet_connected = True
+        huggingface_connected = True
+        # Exemple : vérification d'une connexion rapide aux services
+        api.get_account_details()
+        huggingface_hub.list_repo_files(repo_id=REPO_ID)
+    except:
+        comet_connected = False
+        huggingface_connected = False
+    
+    # Retourner l'état général
+    return {
+        "status": "ok" if model_status == "loaded" and comet_connected and huggingface_connected else "error",
+        "details": {
+            "model": model_status,
+            "comet_ml_connection": "ok" if comet_connected else "error",
+            "huggingface_connection": "ok" if huggingface_connected else "error",
+        }
+    }
