@@ -4,16 +4,75 @@ import numpy as np
 from PIL import Image
 import io
 import tensorflow as tf
+import comet_ml
+import huggingface_hub
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import os
+import uvicorn
+
+# Charger les variables d'environnement
+load_dotenv()
 
 app = FastAPI()
 
-# Charge le modèle sans l'argument custom_objects
-model = tf.keras.models.load_model('model.keras')
+# Configuration
+WORKSPACE = "loule95450"
+PROJECT_NAME = "face-classification"
+REPO_ID = "Loule/face-classification"
+MODEL_FILENAME = "fine_tuned_face_classifier_model.keras"
+PORT = int(os.getenv('PORT', 8000))
+last_model_check = None
+current_model_path = None
+model = None
 
-# Ajoute le middleware CORS
+# Initialisation des clients
+comet_ml.login(
+    project_name=PROJECT_NAME, 
+    workspace=WORKSPACE, 
+    api_key=os.getenv('COMET_API_KEY')
+)
+api = comet_ml.API()
+huggingface_hub.login(token=os.getenv('HUGGINGFACE_TOKEN'))
+
+def get_latest_model():
+    experiences = api.get_experiments(WORKSPACE, PROJECT_NAME)
+    experiences.reverse()
+    
+    for experience in experiences:
+        try:
+            files_in_branch = huggingface_hub.list_repo_files(repo_id=REPO_ID, revision=experience.id)
+            if MODEL_FILENAME in files_in_branch:
+                return experience.id
+        except:
+            continue
+    return None
+
+def load_model_if_needed():
+    global model, last_model_check, current_model_path
+    
+    # Vérifier le modèle toutes les 6 heures
+    if (last_model_check is None or 
+        datetime.now() - last_model_check > timedelta(hours=6)):
+        
+        experiment_id = get_latest_model()
+        if experiment_id:
+            new_model_path = huggingface_hub.hf_hub_download(
+                repo_id=REPO_ID,
+                filename=MODEL_FILENAME,
+                revision=experiment_id
+            )
+            
+            if new_model_path != current_model_path:
+                model = tf.keras.models.load_model(new_model_path)
+                current_model_path = new_model_path
+        
+        last_model_check = datetime.now()
+
+# Middleware CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Changez ici si vous voulez restreindre à des origines spécifiques
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,21 +89,31 @@ def preprocess_image(image):
 # Route de prédiction d'image
 @app.post("/predict")
 async def predict_image(file: UploadFile = File(...)):
-    image_data = await file.read()  # Lit l'image téléchargée
-    image = Image.open(io.BytesIO(image_data))  # Ouvre l'image
-    processed_image = preprocess_image(image)  # Prétraite l'image
+    # Vérifier et charger le dernier modèle si nécessaire
+    load_model_if_needed()
     
-    # Effectue la prédiction
+    if model is None:
+        return {"error": "No model available"}
+    
+    # Lire et prétraiter l'image
+    image_data = await file.read()
+    image = Image.open(io.BytesIO(image_data))
+    processed_image = preprocess_image(image)
+    
+    # Faire la prédiction
     prediction = model.predict(processed_image)
-    fake_probability = float(prediction[0][0])  # Supposons que le modèle retourne une probabilité unique
+    fake_probability = float(prediction[0][0])
     
     return {
         "filename": file.filename,
         "fake_probability": fake_probability,
-        "is_fake": fake_probability > 0.5  # Détermine si l'image est considérée comme fake
+        "is_fake": fake_probability > 0.5
     }
 
-# Route racine pour vérifier si l'API fonctionne
 @app.get("/")
 async def root():
     return {"message": "Image Detection API is running"}
+
+if __name__ == "__main__":
+    print(f"Starting server on port {PORT}")
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)

@@ -4,3 +4,6 @@ python-multipart
 pillow
 numpy
 tensorflow
+huggingface_hub
+comet_ml
+python-dotenv
