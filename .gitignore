@@ -368,6 +368,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-get_model_from_comet.ipynb
-
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,intellij+all,macos,windows,linux,venv,dotenv
