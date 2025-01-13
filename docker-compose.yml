@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "8000:8000"
+      - "55011:55011"
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
